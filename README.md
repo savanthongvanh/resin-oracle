@@ -147,6 +147,8 @@ That is the core lesson of the project.
 
 The REST endpoint is small on purpose. The architectural boundary is the real subject.
 
+One important caveat: this repository still contains both the application code and the app-server container build. That is fine for a demo, but if you want to push the separation of concerns further, a stronger approach is to keep the application in one repository and the app-server container build or runtime packaging in another. That makes the boundary even clearer: application teams ship the WAR, while platform or runtime concerns evolve separately.
+
 ## Running it locally
 
 Start the stack:
@@ -173,4 +175,4 @@ This project is a small example, but the lesson is larger than the endpoint it e
 
 The code demonstrates that a Java application does not need to own connection-pool configuration in order to use the database cleanly. The application can stay focused on web, service, and repository logic while the runtime owns JDBC URLs, credentials, datasource class selection, and pool tuning.
 
-That separation improves maintainability, reduces coupling between development and operations, and helps minimize sensitive information in the codebase. If you want a simple way to show that boundary to a Java team, this project is meant to be a concrete, readable example.
+That separation improves maintainability, reduces coupling between development and operations, and helps minimize sensitive information in the codebase. In a production setup, you would usually strengthen that boundary even more by moving the app-server container build into a separate repository. If you want a simple way to show that direction to a Java team, this project is meant to be a concrete, readable example.
