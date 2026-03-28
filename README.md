@@ -1,10 +1,12 @@
 # Keep Connection Pool Configuration Out of Your Java App
 
-*A small Java 8 service on Resin and Oracle Free that demonstrates a practical boundary: application code handles business behavior, while the runtime owns datasource and pool configuration.*
+*A small Java 8 service on Resin and Oracle Free used to illustrate a broader architectural point: application code should focus on business behavior, while the runtime owns datasource and pool configuration.*
 
 Most Java developers have seen some version of this problem: a codebase starts simple, then slowly collects JDBC URLs, usernames, passwords, pool sizes, and timeout values in places that were supposed to contain application logic. Over time, connection-pool configuration stops being an operational concern and becomes part of day-to-day development.
 
-This project is a deliberately small example of a different approach.
+Today, many companies build most of their new Java services with Spring Boot. That is the normal path now. But not every Java system runs that way, and not every team has fully moved away from application servers. For teams still deploying WARs to app servers, this separation is still directly relevant. For teams on Spring Boot, the underlying architectural lesson still holds: keep connection details and sensitive runtime configuration out of business code when you can.
+
+This project is a deliberately small example of that approach.
 
 It is a Java 8 WAR deployed to Resin, backed by Oracle Free, with a single endpoint:
 
@@ -23,6 +25,8 @@ That means:
 - The application should depend on a `DataSource`, not on environment-specific connection details.
 
 This is also a strategy for minimizing sensitive information in the codebase. If the code only knows a JNDI name, then usernames, passwords, hostnames, and pool settings do not need to be repeated throughout the repository.
+
+This repo uses Resin and Oracle Free because that makes the runtime boundary very visible. But the article is really about the boundary itself, not just this exact stack.
 
 ## What the architecture looks like
 
@@ -133,7 +137,7 @@ So the full path is:
 
 ## Why this is useful for Java teams
 
-If you mostly work in Spring Boot applications, this project is useful as a contrast.
+If you mostly work in Spring Boot applications, this project is useful as a contrast. If you still run applications on app servers, it is more than a contrast; it is a directly relevant deployment model.
 
 It shows a deployment style where:
 
@@ -142,6 +146,8 @@ It shows a deployment style where:
 - connection-pool configuration is separated from application development
 - sensitive connection details are minimized in the codebase
 - changing environments does not require rewriting repository code
+
+For Spring Boot readers, the takeaway is architectural. For app-server readers, it is architectural and operational.
 
 That is the core lesson of the project.
 
@@ -175,4 +181,4 @@ This project is a small example, but the lesson is larger than the endpoint it e
 
 The code demonstrates that a Java application does not need to own connection-pool configuration in order to use the database cleanly. The application can stay focused on web, service, and repository logic while the runtime owns JDBC URLs, credentials, datasource class selection, and pool tuning.
 
-That separation improves maintainability, reduces coupling between development and operations, and helps minimize sensitive information in the codebase. In a production setup, you would usually strengthen that boundary even more by moving the app-server container build into a separate repository. If you want a simple way to show that direction to a Java team, this project is meant to be a concrete, readable example.
+That separation improves maintainability, reduces coupling between development and operations, and helps minimize sensitive information in the codebase. Many teams may apply that lesson inside a Spring Boot platform in different ways. Teams still deploying to app servers can apply it very directly. In a production setup, you would usually strengthen that boundary even more by moving the app-server container build into a separate repository. If you want a simple way to show that direction to a Java team, this project is meant to be a concrete, readable example.
