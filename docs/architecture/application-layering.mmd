@@ -1,0 +1,43 @@
+flowchart TB
+    Client["HTTP Client<br/>curl / Postman / Newman"]
+
+    subgraph War["resin-oracle WAR"]
+        Web["Web Layer<br/>StateController<br/>StateExceptionHandler"]
+        Dto["DTO Layer<br/>StateResponse<br/>ErrorResponse"]
+        Service["Service Layer<br/>StateService"]
+        Port["Repository Port<br/>StateRepositoryPort"]
+        Repo["Oracle Repository<br/>OracleStateRepository<br/>StateRowMapper"]
+        Domain["Domain Model<br/>StateRecord"]
+        Config["Spring Config<br/>RootConfig<br/>WebConfig<br/>DataSourceConfig"]
+    end
+
+    subgraph Resin["Resin Runtime on OpenJDK 8"]
+        Jndi["JNDI DataSource<br/>jdbc/oracle/states<br/>oracle.jdbc.pool.OracleDataSource"]
+        Pool["Externalized Pool Configuration<br/>Oracle thin URL / credentials / min-max / timeouts<br/>driver jar: ojdbc8"]
+    end
+
+    Env["env.dev"]
+    Db["Oracle Free<br/>US_STATES"]
+
+    Client --> Web
+    Web --> Dto
+    Web --> Service
+    Service --> Port
+    Service --> Domain
+    Port --> Repo
+    Repo --> Domain
+    Repo --> Jndi
+    Config --> Jndi
+    Env --> Pool
+    Pool --> Jndi
+    Jndi --> Db
+
+    classDef boundary fill:#dbeafe,stroke:#1d4ed8,color:#0f172a,stroke-width:2px;
+    classDef layer fill:#f8fafc,stroke:#475569,color:#0f172a;
+    classDef external fill:#ecfccb,stroke:#4d7c0f,color:#1f2937;
+    classDef data fill:#fee2e2,stroke:#b91c1c,color:#1f2937;
+
+    class War,Resin boundary;
+    class Web,Dto,Service,Port,Repo,Domain,Config,Jndi layer;
+    class Env,Pool external;
+    class Db data;

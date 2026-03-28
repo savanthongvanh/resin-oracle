@@ -1,0 +1,31 @@
+flowchart LR
+    Env["env.dev"]
+    Compose["docker-compose.yml"]
+    Entry["docker-entrypoint.sh"]
+    ResinConfig["Resin database config<br/>resin.xml.template"]
+    Driver["Oracle JDBC runtime<br/>ojdbc8"]
+    Pool["Resin-managed pool<br/>oracle.jdbc.pool.OracleDataSource"]
+    Jndi["JNDI name<br/>java:comp/env/jdbc/oracle/states"]
+    AppConfig["DataSourceConfig"]
+    Repo["OracleStateRepository"]
+    Db["Oracle Free"]
+
+    Env --> Compose
+    Compose --> Entry
+    Entry --> ResinConfig
+    Driver --> Pool
+    ResinConfig --> Pool
+    Pool --> Jndi
+    Jndi --> AppConfig
+    AppConfig --> Repo
+    Repo --> Db
+
+    classDef config fill:#eff6ff,stroke:#2563eb,color:#0f172a,stroke-width:2px;
+    classDef runtime fill:#ecfccb,stroke:#4d7c0f,color:#1f2937,stroke-width:2px;
+    classDef app fill:#f8fafc,stroke:#475569,color:#0f172a;
+    classDef data fill:#fee2e2,stroke:#b91c1c,color:#1f2937,stroke-width:2px;
+
+    class Env,Compose,Entry,ResinConfig config;
+    class Driver,Pool,Jndi runtime;
+    class AppConfig,Repo app;
+    class Db data;

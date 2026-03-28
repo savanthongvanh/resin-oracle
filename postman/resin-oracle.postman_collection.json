@@ -1,0 +1,153 @@
+{
+  "info": {
+    "_postman_id": "a8f8de0f-fd8e-4f89-9b80-95909be0ad4d",
+    "name": "resin-oracle",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Texas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/states/TX",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "states",
+            "TX"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const body = pm.response.json();",
+              "pm.test('returns Texas payload', function () {",
+              "  pm.expect(body.abbreviation).to.eql('TX');",
+              "  pm.expect(body.name).to.eql('Texas');",
+              "  pm.expect(body.capital).to.eql('Austin');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Normalize lowercase",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/states/tx",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "states",
+            "tx"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('normalizes the state code', function () {",
+              "  pm.expect(pm.response.json().abbreviation).to.eql('TX');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unknown state",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/states/ZZ",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "states",
+            "ZZ"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 404', function () {",
+              "  pm.response.to.have.status(404);",
+              "});",
+              "pm.test('returns state not found code', function () {",
+              "  pm.expect(pm.response.json().error).to.eql('STATE_NOT_FOUND');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid state code",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/states/TEX",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "states",
+            "TEX"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test('returns invalid code error', function () {",
+              "  pm.expect(pm.response.json().error).to.eql('INVALID_STATE_ABBREVIATION');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+

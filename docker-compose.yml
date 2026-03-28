@@ -1,0 +1,50 @@
+services:
+  oracle-db:
+    image: gvenzl/oracle-free:23-slim
+    container_name: resin-oracle-db
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      APP_USER: ${APP_DB_USER}
+      APP_USER_PASSWORD: ${APP_DB_PASSWORD}
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./db/init:/opt/oracle/scripts/app-init:ro
+      - ./scripts/init-db.sh:/container-entrypoint-initdb.d/003_init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  resin-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: resin-oracle-app
+    depends_on:
+      oracle-db:
+        condition: service_healthy
+    environment:
+      ORACLE_HOST: ${ORACLE_HOST}
+      ORACLE_PORT: ${ORACLE_PORT}
+      ORACLE_SERVICE_NAME: ${ORACLE_SERVICE_NAME}
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      DB_POOL_MIN: ${DB_POOL_MIN}
+      DB_POOL_MAX: ${DB_POOL_MAX}
+      DB_POOL_IDLE_TIME: ${DB_POOL_IDLE_TIME}
+      DB_POOL_WAIT_TIME: ${DB_POOL_WAIT_TIME}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/v1/states/TX || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+volumes:
+  oracle-data:

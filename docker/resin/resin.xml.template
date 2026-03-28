@@ -1,0 +1,43 @@
+<resin xmlns="http://caucho.com/ns/resin"
+       xmlns:resin="urn:java:com.caucho.resin">
+
+  <resin:properties path="${__DIR__}/resin.properties" optional="true"/>
+
+  <log-handler name="" level="all" path="stdout:"
+               timestamp="[%y-%m-%d %H:%M:%S.%s]"
+               format=" {${thread}} ${log.message}"/>
+
+  <logger name="" level="info"/>
+
+  <resin:import path="${__DIR__}/cluster-default.xml"/>
+
+  <cluster id="app">
+    <server id="app-0" address="127.0.0.1" port="6800"/>
+
+    <host id="" root-directory=".">
+      <web-app-deploy path="webapps"
+                      expand-preserve-fileset="WEB-INF/work/**"/>
+      <web-app id="/" root-directory="webapps/ROOT"/>
+    </host>
+
+    <!--
+      Resin owns the JDBC URL, credentials, and pool sizing. The application only
+      looks up the JNDI DataSource and borrows connections from the server-managed pool.
+    -->
+    <database jndi-name="jdbc/oracle/states">
+      <driver>
+        <type>oracle.jdbc.pool.OracleDataSource</type>
+        <url>jdbc:oracle:thin:@//@@ORACLE_HOST@@:@@ORACLE_PORT@@/@@ORACLE_SERVICE_NAME@@</url>
+        <user>@@APP_DB_USER@@</user>
+        <password>@@APP_DB_PASSWORD@@</password>
+      </driver>
+      <min-idle-count>@@DB_POOL_MIN@@</min-idle-count>
+      <max-connections>@@DB_POOL_MAX@@</max-connections>
+      <max-idle-time>@@DB_POOL_IDLE_TIME@@</max-idle-time>
+      <connection-wait-time>@@DB_POOL_WAIT_TIME@@</connection-wait-time>
+      <ping>true</ping>
+      <ping-table>DUAL</ping-table>
+    </database>
+  </cluster>
+
+</resin>
